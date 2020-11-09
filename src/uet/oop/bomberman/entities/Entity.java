@@ -14,13 +14,13 @@ public abstract class Entity {
 
 
     public void render(GraphicsContext gc) {
-        SnapshotParameters params = new SnapshotParameters();
-        params.setFill(Color.TRANSPARENT);
+//        SnapshotParameters params = new SnapshotParameters();
+//        params.setFill(Color.TRANSPARENT);
+//
+//        ImageView iv = new ImageView(this.sprite.getFxImage());
+//        Image base = iv.snapshot(params, null);
 
-        ImageView iv = new ImageView(this.sprite.getFxImage());
-        Image base = iv.snapshot(params, null);
-
-        gc.drawImage(base, x , y);
+        gc.drawImage(this.sprite.getFxImage(), x , y);
     }
 
     public abstract void update();

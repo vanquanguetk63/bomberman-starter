@@ -30,6 +30,9 @@ public class BombermanGame extends Application {
     public static int WIDTH = 20;
     public static int HEIGHT = 15;
     public static char[][] _map;
+    public int frameCnt = 0;
+    public long lasttimeFPS = 0;
+    final double ns = 1000000000.0 / 60.0;
 
     private GraphicsContext gc;
     private Canvas canvas;
@@ -60,8 +63,17 @@ public class BombermanGame extends Application {
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long l) {
-                render();
-                update();
+                frameCnt++;
+
+                // check if a second has passed
+                long currenttimeNano = System.nanoTime();
+                if (currenttimeNano > lasttimeFPS + 1000000000) {
+                    render();
+                    update();
+                    frameCnt = 0;
+                    lasttimeFPS = currenttimeNano;
+                }
+
             }
         };
         timer.start();
@@ -69,7 +81,7 @@ public class BombermanGame extends Application {
         createMap();
 
         Entity bomberman = new Bomber(Sprite.SCALED_SIZE, Sprite.SCALED_SIZE, Sprite.player_right);
-        entities.add(bomberman);
+        character.add(bomberman);
     }
 
     public void createMap() {
@@ -102,58 +114,64 @@ public class BombermanGame extends Application {
         for (int i = 0; i < WIDTH; i++) {
             for (int j = 0; j < HEIGHT; j++) {
                 Entity object;
+                int x = i * Sprite.SCALED_SIZE;
+                int y = j * Sprite.SCALED_SIZE;
                 if (_map[j][i] == '#') {
-
+                    entities.add(new LayeredEnity(x, y,
+                            new Grass(x, y, Sprite.grass),
+                            new Wall(x, y, Sprite.wall)));
                 } else if (_map[j][i] == '*'){
-                    object = new LayeredEnity(i * Sprite.SCALED_SIZE, j  * Sprite.SCALED_SIZE,
-                            new Grass(i * Sprite.SCALED_SIZE, j  * Sprite.SCALED_SIZE, Sprite.grass),
-                            new Brick(i * Sprite.SCALED_SIZE, j  * Sprite.SCALED_SIZE, Sprite.brick));
+                    entities.add(new LayeredEnity(x, y,
+                            new Grass(x, y, Sprite.grass),
+                            new Brick(x, y, Sprite.brick)));
                 } else if (_map[j][i] == 'x') {
-                    object = new LayeredEnity(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE,
-                            new Grass(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE, Sprite.grass),
-                            new Portal(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE, Sprite.portal),
-                            new Brick(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE, Sprite.brick));
+                    entities.add(new LayeredEnity(x, y,
+                            new Grass(x, y, Sprite.grass),
+                            new Portal(x, y, Sprite.portal),
+                            new Wall(x, y, Sprite.wall)));
                 } else if (_map[j][i] == '1') {
-                    object = new LayeredEnity(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE,
-                            new Grass(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE, Sprite.grass),
-                            new Baloon(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE, Sprite.balloom_left1));
+                    entities.add(new Grass(x, y, Sprite.grass));
+                    character.add(new Baloon(x, y, Sprite.balloom_left1));
                 } else if (_map[j][i] == '2') {
-                    object = new LayeredEnity(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE,
-                            new Grass(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE, Sprite.grass),
-                            new Oneal(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE, Sprite.oneal_left1));
+                    entities.add(new Grass(x, y, Sprite.grass));
+                    character.add(new Oneal(x, y, Sprite.oneal_left1));
                 } else if (_map[j][i] == 'b') {
-                    object = new LayeredEnity(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE,
-                            new Grass(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE, Sprite.grass),
-                            new Bomb(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE, Sprite.bomb));
+                    entities.add(new LayeredEnity(x, y,
+                                new Grass(x, y, Sprite.grass),
+                                new Bomb(x, y, Sprite.bomb),
+                                new Brick(x, y, Sprite.brick)
+                    ));
                 } else if (_map[j][i] == 'f') {
-                    object = new LayeredEnity(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE,
-                            new Grass(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE, Sprite.grass),
-                            new Flame(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE, Sprite.powerup_flames));
+                    entities.add(new LayeredEnity(x, y,
+                            new Grass(x, y, Sprite.grass),
+                            new Flame(x, y, Sprite.powerup_flames),
+                            new Brick(x, y, Sprite.brick)
+                    ));
                 } else if (_map[j][i] == 's') {
-                    object = new LayeredEnity(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE,
-                            new Grass(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE, Sprite.grass),
-                            new Speed(i * Sprite.SCALED_SIZE, j * Sprite.SCALED_SIZE, Sprite.powerup_speed));
+                    entities.add(new LayeredEnity(x, y,
+                            new Grass(x, y, Sprite.grass),
+                            new Speed(x, y, Sprite.powerup_speed),
+                            new Brick(x, y, Sprite.brick)
+                    ));
                 } else {
-                    object = new Grass(i  * Sprite.SCALED_SIZE, j  * Sprite.SCALED_SIZE, Sprite.grass);
+                    entities.add(new Grass(i  * Sprite.SCALED_SIZE, j  * Sprite.SCALED_SIZE, Sprite.grass));
                 }
 
-//                stillObjects.add(object);
             }
         }
-
     }
 
     public void update() {
-//        for (Entity entity : stillObjects) {
-//            if (entity instanceof LayeredEnity) {
-//                entity.update();
-//            }
-//        }
+        for (Entity entity : character) {
+            if (entity instanceof Bomber) {
+                entity.update();
+            }
+        }
     }
 
     public void render() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        character.forEach(g -> g.render(gc));
         entities.forEach(g -> g.render(gc));
+        character.forEach(g -> g.render(gc));
     }
 }

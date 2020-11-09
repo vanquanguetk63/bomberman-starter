@@ -28,4 +28,8 @@ public class Baloon extends Animated {
     public void render(GraphicsContext gc) {
         super.render(gc);
     }
+
+    @Override
+    public void update() {
+    }
 }

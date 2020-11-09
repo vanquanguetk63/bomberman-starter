@@ -11,8 +11,7 @@ public class Bomber extends Animated {
 
     @Override
     public void update() {
-//        img = Sprite.player_right_1.getFxImage();
-//        img = Sprite.player_right_2.getFxImage();
+        x+=10;
     }
 
     @Override
