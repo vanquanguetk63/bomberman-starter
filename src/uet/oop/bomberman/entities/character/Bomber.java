@@ -2,19 +2,20 @@ package uet.oop.bomberman.entities.character;
 
 import uet.oop.bomberman.Board;
 import uet.oop.bomberman.Game;
+//import uet.oop.bomberman.GameSound;
 import uet.oop.bomberman.entities.Entity;
-import uet.oop.bomberman.entities.LayeredEntity;
 import uet.oop.bomberman.entities.bomb.Bomb;
 import uet.oop.bomberman.entities.bomb.Flame;
+import uet.oop.bomberman.entities.bomb.FlameSegment;
 import uet.oop.bomberman.entities.character.enemy.Enemy;
-import uet.oop.bomberman.entities.tile.Wall;
-import uet.oop.bomberman.entities.tile.destroyable.Brick;
+import uet.oop.bomberman.entities.tile.item.Item;
 import uet.oop.bomberman.graphics.Screen;
 import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.input.Keyboard;
 import uet.oop.bomberman.level.Coordinates;
 
-import java.lang.reflect.GenericArrayType;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class Bomber extends Character {
 
     private List<Bomb> _bombs;
     protected Keyboard _input;
+    public static List<Item> _item = new ArrayList<Item>();
 
     /**
      * nếu giá trị này < 0 thì cho phép đặt đối tượng Bomb tiếp theo,
@@ -80,10 +82,31 @@ public class Bomber extends Character {
         // TODO: _timeBetweenPutBombs dùng để ngăn chặn Bomber đặt 2 Bomb cùng tại 1 vị trí trong 1 khoảng thời gian quá ngắn
         // TODO: nếu 3 điều kiện trên thỏa mãn thì thực hiện đặt bom bằng placeBomb()
         // TODO: sau khi đặt, nhớ giảm số lượng Bomb Rate và reset _timeBetweenPutBombs về 0
+        if(_input.space && Game.getBombRate() > 0 && _timeBetweenPutBombs < 0) {
+
+            int xt = Coordinates.pixelToTile(_x + _sprite.getSize() / 2);
+            int yt = Coordinates.pixelToTile( (_y + _sprite.getSize() / 2) - _sprite.getSize() ); //subtract half player height and minus 1 y position
+
+            placeBomb(xt,yt);
+            Game.addBombRate(-1);
+
+            _timeBetweenPutBombs = 30;
+        }
     }
 
     protected void placeBomb(int x, int y) {
         // TODO: thực hiện tạo đối tượng bom, đặt vào vị trí (x, y)
+
+        Bomb b = new Bomb(x, y, _board);
+
+        _board.addBomb(b);
+//        try {
+//            GameSound.newBomb();
+//        } catch (IOException a) {
+//            a.printStackTrace();
+//        }
+
+
     }
 
     private void clearBombs() {
@@ -104,6 +127,12 @@ public class Bomber extends Character {
     public void kill() {
         if (!_alive) return;
         _alive = false;
+//        try {
+//            GameSound.bomberDie();
+//        } catch (IOException a) {
+//            a.printStackTrace();
+//        }
+
     }
 
     @Override
@@ -116,124 +145,80 @@ public class Bomber extends Character {
 
     @Override
     protected void calculateMove() {
-        // @todo: xử lý nhận tín hiệu điều khiển hướng đi từ _input và gọi move() để thực hiện di chuyển
-        // @todo: nhớ cập nhật lại giá trị cờ _moving khi thay đổi trạng thái di chuyển
-        _moving = true;
-
-        if (_input.up) {
-            move(0, -Game.getBomberSpeed());
-        } else if (_input.down) {
-            move(0, Game.getBomberSpeed());
-        } else if (_input.left) {
-            move(-Game.getBomberSpeed(), 0);
-        } else if (_input.right) {
-            move(Game.getBomberSpeed(), 0);
+        // TODO: xử lý nhận tín hiệu điều khiển hướng đi từ _input và gọi move() để thực hiện di chuyển
+        // TODO: nhớ cập nhật lại giá trị cờ _moving khi thay đổi trạng thái di chuyển
+        int xa=0 ,ya=0 ;
+        if(_input.down) ya++;
+        if(_input.up) ya--;
+        if(_input.left) xa--;
+        if(_input.right) xa++;
+        if(xa != 0 || ya != 0) {
+            move(xa * Game.getBomberSpeed(), ya * Game.getBomberSpeed());
+            _moving = true;
         } else {
             _moving = false;
         }
+
     }
 
     @Override
     public boolean canMove(double x, double y) {
-        // @todo: kiểm tra có đối tượng tại vị trí chuẩn bị di chuyển đến và có thể di chuyển tới đó hay không
-        Entity nextEntity = _board.getEntity(Coordinates.pixelToTile(x),
-                Coordinates.pixelToTile(y), this);
-        return collide(nextEntity);
-    }
+        // TODO: kiểm tra có đối tượng tại vị trí chuẩn bị di chuyển đến và có thể di chuyển tới đó hay khôn
+        for (int c = 0; c < 4; c++) { //colision detection for each corner of the player
+            double xt = ((_x + x) + c % 2 * 11) / Game.TILES_SIZE; //divide with tiles size to pass to tile coordinate
+            double yt = ((_y + y) + c / 2 * 12 - 13) / Game.TILES_SIZE; //these values are the best from multiple tests
 
+            Entity a = _board.getEntity(xt, yt, this);
 
-    private boolean canMoveNotCollide(double x, double y) {
-        Entity nextEntity = _board.getEntity(Coordinates.pixelToTile(x), Coordinates.pixelToTile(y), this);
-        if (nextEntity instanceof Wall) return false;
-        if (nextEntity instanceof LayeredEntity) {
-            Entity topEntity = ((LayeredEntity) nextEntity).getTopEntity();
-            if (topEntity instanceof Brick) return false;
+            if(!a.collide(this))
+                return false;
         }
+
         return true;
-    }
 
-
-    public void moveCenterX() {
-        int pixelOfEntity = Coordinates.tileToPixel(1);
-        double centerX = _x + _sprite.get_realWidth() / 2;
-        int tileCenterX = Coordinates.pixelToTile(centerX);
-        _x = Coordinates.tileToPixel(tileCenterX) + pixelOfEntity / 2 - _sprite.get_realWidth() / 2;
-    }
-
-    public void moveCenterY() {
-        int pixelOfEntity = Coordinates.tileToPixel(1);
-        double centerY = _y - _sprite.get_realHeight() / 2;
-        int tileCenterY = Coordinates.pixelToTile(centerY);
-        _y = Coordinates.tileToPixel(tileCenterY) + pixelOfEntity / 2 + _sprite.get_realHeight() / 2;
-    }
-
-    private void autoMoveCenter() {
-        int pixelOfEntity = Coordinates.tileToPixel(1);
-        double centerX = _x + _sprite.get_realWidth() / 2;
-        double centerY = _y - _sprite.get_realHeight() / 2;
-
-        boolean contactTop = !canMoveNotCollide(centerX, centerY - pixelOfEntity / 2);
-        boolean contactDown = !canMoveNotCollide(centerX, centerY + pixelOfEntity / 2);
-        boolean contactLeft = !canMoveNotCollide(centerX - pixelOfEntity / 2, centerY);
-        boolean contactRight = !canMoveNotCollide(centerX + pixelOfEntity / 2, centerY);
-
-        // Các trường hợp đi một nửa người vào tường cũng tự động căn giữa.
-        if (_direction != 0 && contactDown) moveCenterY();
-        if (_direction != 1 && contactLeft) moveCenterX();
-        if (_direction != 2 && contactTop) moveCenterY();
-        if (_direction != 3 && contactRight) moveCenterX();
     }
 
     @Override
     public void move(double xa, double ya) {
-        // @todo: sử dụng canMove() để kiểm tra xem có thể di chuyển tới điểm đã tính toán hay không và thực hiện thay đổi tọa độ _x, _y
-        // @todo: nhớ cập nhật giá trị _direction sau khi di chuyển : up, right, down, left -> 0, 1, 2, 3
-        // @todo: Di chuyển nhân vật ra giữa.
+        // TODO: sử dụng canMove() để kiểm tra xem có thể di chuyển tới điểm đã tính toán hay không và thực hiện thay đổi tọa độ _x, _y
+        // TODO: nhớ cập nhật giá trị _direction sau khi di chuyển
+        if(xa > 0) _direction = 1;
+        if(xa < 0) _direction = 3;
+        if(ya > 0) _direction = 2;
+        if(ya < 0) _direction = 0;
 
-        // Tính tọa độ tâm người
-        double centerX = _x + _sprite.get_realWidth() / 2;
-        double centerY = _y - _sprite.get_realHeight() / 2;
-
-        if (xa > 0) _direction = 1;
-        if (xa < 0) _direction = 3;
-        if (ya > 0) _direction = 2;
-        if (ya < 0) _direction = 0;
-        if (canMove(centerX + xa, centerY + ya)) {
-            _x += xa;
+        if(canMove(0, ya)) { //separate the moves for the player can slide when is colliding
             _y += ya;
         }
 
-        autoMoveCenter();
-    }
-
-    public boolean handleCollidePortal() {
-        if (_board.detectNoEnemies()) {
-            _board.nextLevel();
-            return true;
+        if(canMove(xa, 0)) {
+            _x += xa;
         }
 
-        return false;
     }
 
     @Override
     public boolean collide(Entity e) {
-        // @todo: xử lý va chạm với Flame
-        // @todo: xử lý va chạm với Enemy
-        if (e instanceof Flame) {
-            this.kill();
-            return true;
+        // TODO: xử lý va chạm với Flame
+        // TODO: xử lý va chạm với Enemy
+        if(e instanceof Flame) {
+            kill();
+            return false;
         }
 
-        if (e instanceof Enemy) {
-            this.kill();
+        if(e instanceof Enemy) {
+            kill();
             return true;
         }
-
-        if (e instanceof Wall) return false;
-        if (e instanceof Brick) return false;
-        if (e instanceof LayeredEntity) return e.collide(this);
 
         return true;
+    }
+    public void addItem(Item item) {
+        if(item.isRemoved()) return;
+
+        _item.add(item);
+
+
     }
 
     private void chooseSprite() {

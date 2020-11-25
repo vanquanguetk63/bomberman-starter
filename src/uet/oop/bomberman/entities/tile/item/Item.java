@@ -5,7 +5,9 @@ import uet.oop.bomberman.graphics.Sprite;
 
 public abstract class Item extends Tile {
 
+	public boolean _active=false;
 	public Item(int x, int y, Sprite sprite) {
 		super(x, y, sprite);
+		//_level = level;
 	}
 }

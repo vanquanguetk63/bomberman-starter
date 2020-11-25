@@ -27,15 +27,15 @@ public abstract class Entity implements IRender {
 	 */
 	@Override
 	public abstract void render(Screen screen);
-	
+
 	public void remove() {
 		_removed = true;
 	}
-	
+
 	public boolean isRemoved() {
 		return _removed;
 	}
-	
+
 	public Sprite getSprite() {
 		return _sprite;
 	}
@@ -46,21 +46,20 @@ public abstract class Entity implements IRender {
 	 * @return
 	 */
 	public abstract boolean collide(Entity e);
-	
+
 	public double getX() {
 		return _x;
 	}
-	
+
 	public double getY() {
 		return _y;
 	}
-	
+
 	public int getXTile() {
 		return Coordinates.pixelToTile(_x + _sprite.SIZE / 2);
 	}
-	
+
 	public int getYTile() {
 		return Coordinates.pixelToTile(_y - _sprite.SIZE / 2);
 	}
-
 }
