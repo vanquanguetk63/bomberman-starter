@@ -17,7 +17,10 @@ public class Portal extends Tile {
 		// TODO: xử lý khi Bomber đi vào
 		if(e instanceof Bomber){
 			if(e.getXTile() == this.getX() && e.getYTile() == this.getY()) {
-				board.nextLevel();
+				if (board.detectNoEnemies()) {
+					board.endGame();
+				}
+
 			}
 			return true;
 		}

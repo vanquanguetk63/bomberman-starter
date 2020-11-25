@@ -17,7 +17,7 @@ public class SpeedItem extends Item {
 		if(e instanceof Bomber) {
 			((Bomber) e).addItem(this);
 			if(_active==false)
-				Game.addBomberSpeed(0.1);
+				Game.addBomberSpeed(0.2);
 			remove();
 			_active=true;
 			return true;
