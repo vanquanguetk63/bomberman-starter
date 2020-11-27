@@ -1,5 +1,6 @@
 package uet.oop.bomberman.level;
 
+import javafx.fxml.LoadException;
 import uet.oop.bomberman.Board;
 import uet.oop.bomberman.Game;
 import uet.oop.bomberman.entities.LayeredEntity;
@@ -15,7 +16,6 @@ import uet.oop.bomberman.entities.tile.destroyable.Brick;
 import uet.oop.bomberman.entities.tile.item.BombItem;
 import uet.oop.bomberman.entities.tile.item.FlameItem;
 import uet.oop.bomberman.entities.tile.item.SpeedItem;
-import uet.oop.bomberman.exceptions.LoadLevelException;
 import uet.oop.bomberman.graphics.Screen;
 import uet.oop.bomberman.graphics.Sprite;
 
@@ -33,7 +33,7 @@ public class FileLevelLoader extends LevelLoader {
 	 */
 	private static char[][] _map;
 
-	public FileLevelLoader(Board board, int level) throws LoadLevelException {
+	public FileLevelLoader(Board board, int level) throws LoadException {
 		super(board, level);
 	}
 

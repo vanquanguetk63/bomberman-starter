@@ -3,6 +3,7 @@ package uet.oop.bomberman.entities.character.enemy;
 import uet.oop.bomberman.Board;
 import uet.oop.bomberman.Game;
 //import uet.oop.bomberman.GameSound;
+import uet.oop.bomberman.Sound;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Message;
 import uet.oop.bomberman.entities.bomb.Bomb;
@@ -156,11 +157,11 @@ public abstract class Enemy extends Character {
 	public void kill() {
 		if(!_alive) return;
 		_alive = false;
-//		try {
-//			GameSound.monsterDie();
-//		} catch (IOException a) {
-//			a.printStackTrace();
-//		}
+		try {
+			Sound.MonsterDie();
+		} catch (IOException a) {
+			a.printStackTrace();
+		}
 		_board.addPoints(_points);
 
 		Message msg = new Message("+" + _points, getXMessage(), getYMessage(), 2, Color.white, 14);

@@ -3,16 +3,16 @@ package uet.oop.bomberman.entities.bomb;
 import uet.oop.bomberman.Board;
 import uet.oop.bomberman.Game;
 //import uet.oop.bomberman.GameSound;
+import uet.oop.bomberman.Sound;
 import uet.oop.bomberman.entities.AnimatedEntitiy;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.character.Bomber;
-import uet.oop.bomberman.exceptions.GameException;
 import uet.oop.bomberman.graphics.Screen;
 import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.level.Coordinates;
 
 import java.io.IOException;
-import java.nio.file.DirectoryIteratorException;
+
 
 public class Bomb extends AnimatedEntitiy {
 
@@ -91,11 +91,11 @@ public class Bomb extends AnimatedEntitiy {
 		}
 
 		_flames = new Flame[4];
-//		try {
-//			GameSound.bombBang();
-//		} catch (IOException a) {
-//			a.printStackTrace();
-//		}
+		try {
+			Sound.Explosion();
+		} catch (IOException a) {
+			a.printStackTrace();
+		}
 		for (int i = 0; i < _flames.length; i++) {
 			_flames[i] = new Flame((int)_x, (int)_y, i, Game.getBombRadius(), _board);
 		}

@@ -3,6 +3,7 @@ package uet.oop.bomberman.entities.character;
 import uet.oop.bomberman.Board;
 import uet.oop.bomberman.Game;
 //import uet.oop.bomberman.GameSound;
+import uet.oop.bomberman.Sound;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.bomb.Bomb;
 import uet.oop.bomberman.entities.bomb.Flame;
@@ -100,11 +101,11 @@ public class Bomber extends Character {
         Bomb b = new Bomb(x, y, _board);
 
         _board.addBomb(b);
-//        try {
-//            GameSound.newBomb();
-//        } catch (IOException a) {
-//            a.printStackTrace();
-//        }
+        try {
+            Sound.NewBomb();
+        } catch (IOException a) {
+            a.printStackTrace();
+        }
 
 
     }
@@ -127,11 +128,11 @@ public class Bomber extends Character {
     public void kill() {
         if (!_alive) return;
         _alive = false;
-//        try {
-//            GameSound.bomberDie();
-//        } catch (IOException a) {
-//            a.printStackTrace();
-//        }
+        try {
+            Sound.Die();
+        } catch (IOException a) {
+            a.printStackTrace();
+        }
 
     }
 

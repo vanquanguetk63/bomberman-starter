@@ -1,9 +1,11 @@
 package uet.oop.bomberman.gui;
 
 import uet.oop.bomberman.Game;
+import uet.oop.bomberman.Sound;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 /**
  * Swing Frame chứa toàn bộ các component
@@ -33,8 +35,12 @@ public class Frame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		pack();
 		setLocationRelativeTo(null);
-		setVisible(true);	
-		
+		setVisible(true);
+//		try {
+//			Sound.Menu();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		_game.start();
 	}
 	

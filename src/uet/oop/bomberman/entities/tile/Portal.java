@@ -1,9 +1,12 @@
 package uet.oop.bomberman.entities.tile;
 
+import uet.oop.bomberman.Sound;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.character.Bomber;
 import uet.oop.bomberman.graphics.Sprite;
 import uet.oop.bomberman.Board;
+
+import java.io.IOException;
 
 public class Portal extends Tile {
 	protected Board board;
@@ -18,9 +21,13 @@ public class Portal extends Tile {
 		if(e instanceof Bomber){
 			if(e.getXTile() == this.getX() && e.getYTile() == this.getY()) {
 				if (board.detectNoEnemies()) {
+					try {
+						Sound.Win();
+					} catch (IOException ioException) {
+						ioException.printStackTrace();
+					}
 					board.endGame();
 				}
-
 			}
 			return true;
 		}
